@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 
-from embed_regularize import embedded_dropout
-from locked_dropout import LockedDropout
-from weight_drop import WeightDrop
+from PTB.embed_regularize import embedded_dropout
+from PTB.locked_dropout import LockedDropout
+from PTB.weight_drop import WeightDrop
 
 class RNNModel(nn.Module):
     """Container module with an encoder, a recurrent module, and a decoder."""

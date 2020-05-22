@@ -5,10 +5,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-import data
-import model
+import PTB.data
+import PTB.model
 
-from utils import batchify, get_batch, repackage_hidden
+from PTB.utils import batchify, get_batch, repackage_hidden
 
 parser = argparse.ArgumentParser(description='PyTorch PennTreeBank RNN/LSTM Language Model')
 parser.add_argument('--data', type=str, default='data/penn/',
@@ -91,26 +91,35 @@ def model_load(fn):
 
 import os
 import hashlib
-fn = 'corpus.{}.data'.format(hashlib.md5(args.data.encode()).hexdigest())
-if os.path.exists(fn):
-    print('Loading cached dataset...')
-    corpus = torch.load(fn)
-else:
-    print('Producing dataset...')
-    corpus = data.Corpus(args.data)
-    torch.save(corpus, fn)
+# fn = 'corpus.{}.data'.format(hashlib.md5(args.data.encode()).hexdigest())
+# if os.path.exists(fn):
+#     print('Loading cached dataset...')
+#     corpus = torch.load(fn)
+# else:
+#     print('Producing dataset...')
+#     corpus = data.Corpus(args.data)
+#     torch.save(corpus, fn)
+
+import requests             #TODO: Finish data setup 
+
+urls = ['https://raw.githubusercontent.com/wojzaremba/lstm/master/data/ptb.train.txt',
+        'https://raw.githubusercontent.com/wojzaremba/lstm/master/data/ptb.valid.txt',
+        'https://raw.githubusercontent.com/wojzaremba/lstm/master/data/ptb.test.txt']
+
+test = requests.get(urls[0])
+print(test)
 
 eval_batch_size = 10
 test_batch_size = 1
-train_data = batchify(corpus.train, args.batch_size, args)
-val_data = batchify(corpus.valid, eval_batch_size, args)
-test_data = batchify(corpus.test, test_batch_size, args)
+train_data = batchify(requests.get(urls[0]), args.batch_size, args)
+val_data = batchify(requests.get(urls[1]), eval_batch_size, args)
+test_data = batchify(requests.get(urls[2]), test_batch_size, args)
 
 ###############################################################################
 # Build the model
 ###############################################################################
 
-from splitcross import SplitCrossEntropyLoss
+from PTB.splitcross import SplitCrossEntropyLoss
 criterion = None
 
 ntokens = len(corpus.dictionary)
