@@ -1,6 +1,3 @@
-# Copied from https://github.com/salesforce/awd-lstm-lm
-# For model in paper: "Regularizing and Optimizing LSTM Language Models" (Merity et al.) https://arxiv.org/pdf/1708.02182.pdf
-
 import torch
 import torch.nn as nn
 from torch.autograd import Variable

@@ -1,3 +1,5 @@
+# Lookahead implementation from: https://github.com/michaelrzhang/lookahead/blob/master/lookahead_pytorch.py
+
 from collections import defaultdict
 
 import torch
