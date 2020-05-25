@@ -7,13 +7,11 @@ from torch import nn
 import numpy as np 
 import torchbearer
 
-NB_EPOCHS = 10
-
+NB_EPOCHS = 200
 torch.manual_seed(3)
 
 # Data setup 
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True)
-
 channel_means = [np.mean(trainset.data[:,:,:,i]) for i in range(3)]
 channel_stds = [np.std(trainset.data[:,:,:,i]) for i in range(3)]
 
@@ -36,12 +34,10 @@ testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True
 # Data loaders
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True)
 valloader = torch.utils.data.DataLoader(testset, batch_size=128, shuffle=False)
-
 device = "cuda:0"
 results = []
 
 def train(optimizer_name):
-
     scheduler = torchbearer.callbacks.torch_scheduler.MultiStepLR(milestones=[60, 120, 160], gamma=0.2)
     model = ResNet18()
     checkpoint = torchbearer.callbacks.ModelCheckpoint('CIFAR\\' + optimizer_name + '_checkpoint.pt')
@@ -53,6 +49,8 @@ def train(optimizer_name):
         optimizer = Lookahead(torch.optim.SGD(model.parameters(), lr=0.1), la_alpha=0.8, la_steps=5)
     elif optimizer_name == 'AdamW':
         optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=1)
+    elif optimizer_name == 'Polyak':
+        optimizer = torch.optim.ASGD(model.parameters(), lr=0.3, weight_decay=0.001)
 
     loss_function = nn.CrossEntropyLoss()
     trial = torchbearer.Trial(model, optimizer, loss_function, metrics=['loss', 'accuracy'], callbacks=[scheduler, checkpoint, logger]).to(device)
@@ -60,7 +58,7 @@ def train(optimizer_name):
     results.append(trial.run(epochs=NB_EPOCHS))   
 
 # Run 
-optimizer_names = ['SGD', 'Lookahead', 'AdamW']
+optimizer_names = ['SGD', 'Lookahead', 'AdamW', 'Polyak']
 for opt in optimizer_names:
     train(opt)
 
@@ -74,4 +72,3 @@ for opt_name, result in zip(optimizer_names, results):
     plt.plot(pd.DataFrame(result)['val_loss'], label=opt_name)
     # pd.DataFrame(result).to_csv("results_"+opt_name)
 plt.savefig('CIFAR\\loss_plot.png')
-
