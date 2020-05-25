@@ -13,7 +13,6 @@ torch.manual_seed(3)
 
 # Data setup 
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True)
-testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True)
 
 channel_means = [np.mean(trainset.data[:,:,:,i]) for i in range(3)]
 channel_stds = [np.std(trainset.data[:,:,:,i]) for i in range(3)]
