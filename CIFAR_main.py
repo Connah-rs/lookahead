@@ -16,15 +16,23 @@ trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True
 testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True)
 
 channel_means = [np.mean(trainset.data[:,:,:,i]) for i in range(3)]
-channel_stds = [np.std(testset.data[:,:,:,i]) for i in range(3)]
+channel_stds = [np.std(trainset.data[:,:,:,i]) for i in range(3)]
 
-transform = transforms.Compose(
+# Transforms
+train_transform = transforms.Compose(
+    [transforms.RandomCrop(32, padding=4),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[x / 255.0 for x in channel_means],
+                        std=[x / 255.0 for x in channel_stds])])
+
+test_transform = transforms.Compose(
     [transforms.ToTensor(),
     transforms.Normalize(mean=[x / 255.0 for x in channel_means],
                         std=[x / 255.0 for x in channel_stds])])
 
-trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
-testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=train_transform)
+testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=test_transform)
 
 # Data loaders
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True)
