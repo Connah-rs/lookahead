@@ -1,4 +1,5 @@
 # Resnet implementation from https://github.com/uoguelph-mlrg/Cutout/blob/master/model/resnet.py
+
 '''ResNet18/34/50/101/152 in Pytorch.'''
 import torch
 import torch.nn as nn

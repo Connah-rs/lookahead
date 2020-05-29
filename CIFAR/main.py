@@ -85,18 +85,6 @@ def train(optimizer_name):
 optimizer_names = ['SGD', 'Lookahead', 'AdamW', 'Polyak', 'Adam', 'Lookahead(Adam)']
 # optimizer_names = ['Adam', 'Lookahead(Adam)']
 for trial_num in range(NB_TRIALS):
+    torch.manual_seed(trial_num+1)
     for i, opt in enumerate(optimizer_names):
-        torch.manual_seed(i+1)
         train(opt)
-
-    # Test Plot
-    import matplotlib.pyplot as plt 
-    import pandas as pd 
-
-    plt.figure()
-    for opt_name, result in zip(optimizer_names, results):
-        plt.plot(pd.DataFrame(result)['val_loss'], label=opt_name)
-        # pd.DataFrame(result).to_csv("results_"+opt_name)
-    plt.grid(True)
-    plt.legend()
-    plt.savefig(DATASET + "\\" + str(trial_num) + '\\loss_plot.png')
