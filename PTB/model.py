@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 
-from PTB.embed_regularize import embedded_dropout
-from PTB.locked_dropout import LockedDropout
-from PTB.weight_drop import WeightDrop
+from embed_regularize import embedded_dropout
+from locked_dropout import LockedDropout
+from weight_drop import WeightDrop
 
 class RNNModel(nn.Module):
     """Container module with an encoder, a recurrent module, and a decoder."""
@@ -19,7 +19,7 @@ class RNNModel(nn.Module):
         if rnn_type == 'LSTM':
             self.rnns = [torch.nn.LSTM(ninp if l == 0 else nhid, nhid if l != nlayers - 1 else (ninp if tie_weights else nhid), 1, dropout=0) for l in range(nlayers)]
             if wdrop:
-                self.rnns = [WeightDrop(rnn, ['weight_hh_l0'], dropout=wdrop) for rnn in self.rnns]
+                self.rnns = [WeightDrop(rnn, ['weight_hh_l0'], dropout=wdrop) for rnn in self.rnns] #wdrop=0.5
         if rnn_type == 'GRU':
             self.rnns = [torch.nn.GRU(ninp if l == 0 else nhid, nhid if l != nlayers - 1 else ninp, 1, dropout=0) for l in range(nlayers)]
             if wdrop:
@@ -66,10 +66,10 @@ class RNNModel(nn.Module):
         self.decoder.weight.data.uniform_(-initrange, initrange)
 
     def forward(self, input, hidden, return_h=False):
-        emb = embedded_dropout(self.encoder, input, dropout=self.dropoute if self.training else 0)
+        emb = embedded_dropout(self.encoder, input, dropout=self.dropoute if self.training else 0) #dropoute=0.1
         #emb = self.idrop(emb)
 
-        emb = self.lockdrop(emb, self.dropouti)
+        emb = self.lockdrop(emb, self.dropouti) #dropouti=0.65
 
         raw_output = emb
         new_hidden = []
@@ -83,15 +83,15 @@ class RNNModel(nn.Module):
             raw_outputs.append(raw_output)
             if l != self.nlayers - 1:
                 #self.hdrop(raw_output)
-                raw_output = self.lockdrop(raw_output, self.dropouth)
+                raw_output = self.lockdrop(raw_output, self.dropouth) #dropouth=0.3
                 outputs.append(raw_output)
         hidden = new_hidden
 
-        output = self.lockdrop(raw_output, self.dropout)
+        output = self.lockdrop(raw_output, self.dropout) #output dropout=0.4 (not mentioned in Lookahead paper)
         outputs.append(output)
 
         result = output.view(output.size(0)*output.size(1), output.size(2))
-        if return_h:
+        if return_h: #only on training
             return result, hidden, raw_outputs, outputs
         return result, hidden
 

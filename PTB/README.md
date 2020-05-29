@@ -1,7 +1,5 @@
 # LSTM and QRNN Language Model Toolkit
 
-Cloned from https://github.com/salesforce/awd-lstm-lm
-
 This repository contains the code used for two [Salesforce Research](https://einstein.ai/) papers:
 + [Regularizing and Optimizing LSTM Language Models](https://arxiv.org/abs/1708.02182)
 + [An Analysis of Neural Language Modeling at Multiple Scales](https://arxiv.org/abs/1803.08240)
