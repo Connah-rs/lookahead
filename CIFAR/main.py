@@ -1,7 +1,7 @@
 import torchvision
 import torchvision.transforms as transforms
 from lookahead_pytorch import Lookahead
-from CIFAR.model import ResNet18
+from model import ResNet18
 import torch 
 from torch import nn 
 import numpy as np 
